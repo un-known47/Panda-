@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>For My Love</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe Script', cursive;
+      background: linear-gradient(-45deg, #ff99cc, #99ff99, #66ccff, #ff99cc);
+      background-size: 400% 400%;
+      animation: gradientMove 15s ease infinite;
+      color: white;
+      overflow-x: hidden;
+    }
+
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .fade-enter {
+      opacity: 0;
+      transform: scale(0.95);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .fade-enter-active {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .floating-heart {
+      position: fixed;
+      bottom: -50px;
+      font-size: 2rem;
+      opacity: 0.7;
+      animation: floatUp 10s linear infinite;
+      pointer-events: none;
+    }
+
+    @keyframes floatUp {
+      0% { transform: translateY(0); opacity: 0.7; }
+      100% { transform: translateY(-100vh); opacity: 0; }
+    }
+
+    .center {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      text-align: center;
+      opacity: 0;
+      transform: translateY(50px);
+      animation: fadeIn 1s forwards;
+    }
+    @keyframes fadeIn {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h1 { font-size: 3rem; margin-bottom: 20px; font-family: 'Brush Script MT', cursive; }
+    p { font-size: 1.2rem; max-width: 600px; margin-bottom: 30px; font-family: 'Segoe Print', cursive; }
+    a.button {
+      text-decoration: none;
+      background: white;
+      color: #ff3399;
+      padding: 15px 30px;
+      border-radius: 30px;
+      font-weight: bold;
+      box-shadow: 0 0 20px rgba(0,0,0,0.3);
+      transition: 0.3s;
+    }
+    a.button:hover { transform: scale(1.1); background: #ff3399; color: white; }
+
+    .pop-in {
+      animation: popIn 0.6s ease forwards;
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(0); opacity: 0; }
+      60% { transform: scale(1.2); opacity: 1; }
+      100% { transform: scale(1); }
+    }
+
+    .overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+      background: rgba(0,0,0,0.8); backdrop-filter: blur(10px);
+      display: none; justify-content: center; align-items: center; flex-direction: column;
+      z-index: 999;
+    }
+    .overlay.active { display: flex; animation: fadeOverlay 1s; }
+
+    @keyframes fadeOverlay {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .carousel {
+      position: relative; width: 90%; max-width: 1000px; overflow: hidden;
+    }
+    .slides {
+      display: flex; transition: transform 0.5s ease;
+    }
+    .slide {
+      min-width: 100%; position: relative; display: flex; justify-content: center; align-items: center;
+    }
+    .slide img.bg {
+      position: absolute; width: 100%; height: 100%; object-fit: cover; filter: blur(20px) brightness(0.4);
+    }
+    .content-box {
+      display: flex; background: rgba(255,255,255,0.2); backdrop-filter: blur(5px); 
+      border-radius: 20px; padding: 20px; z-index: 2; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      flex-direction: row; width: 90%; max-width: 900px; align-items: center;
+      opacity: 0;
+      transform: scale(0.9);
+      transition: all 0.5s ease;
+    }
+    .slide.active .content-box {
+      opacity: 1;
+      transform: scale(1);
+    }
+    .content-box img.main {
+      width: 40%; border-radius: 15px; margin-right: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    .text-box h2 { font-size: 2rem; margin-bottom: 10px; font-family: 'Brush Script MT', cursive; }
+    .text-box p { font-size: 1.1rem; font-family: 'Segoe Print', cursive; }
+
+    .nav-btn { position: absolute; top: 50%; transform: translateY(-50%); z-index: 3; background: rgba(255,255,255,0.6); border: none; padding: 15px; border-radius: 50%; cursor: pointer; font-size: 2rem; }
+    .left-btn { left: 20px; }
+    .right-btn { right: 20px; }
+
+    .instruction { margin-top: 20px; font-size: 1.2rem; }
+
+    .iloveyouOverlay-content {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      z-index: 2;
+      text-align: center;
+    }
+    .iloveyou-text {
+      font-family: "Brush Script MT", cursive;
+      font-size: 3rem; text-shadow: 2px 2px 10px rgba(0,0,0,0.5);
+      margin-bottom: 40px;
+    }
+    .iloveyou-text span { opacity: 0; transition: opacity 0.2s ease; }
+
+    .counter-text { font-family: "Segoe Print", cursive; font-size: 2rem; text-shadow: 2px 2px 10px rgba(0,0,0,0.5); text-align: center; max-width: 700px; z-index: 2; position: relative; }
+    .counter { margin-top: 20px; font-weight: bold; color: #ffd700; }
+
+    .overlay#iloveyouOverlay::before, .overlay#counterOverlay::before {
+      content: '';
+      position: absolute;
+      width: 100%; height: 100%;
+      background: url('https://cdn.discordapp.com/attachments/1215080783111262238/1385741295821258783/a54fc505-4750-461e-bb35-ce72559ae2e4.jpg?ex=68572ba6&is=6855da26&hm=af29c467cf67839e5f34271fa39b6b85119498bceaee0133fed664c96f2d22d8&') center/cover no-repeat;
+      filter: blur(2px) brightness(0.5);
+      z-index: 1;
+    }
+  </style>
+</head>
+<body>
+  <div class="floating-heart">💖</div>
+  <div class="center">
+    <h1>Hey My Cutu Panda💗🐼</h1>
+    <p>Every moment with you feels like a beautiful dream I never want to wake up from. You bring endless joy, laughter, and love into my life, and I’m so grateful to call you mine. 💖🐼</p>
+    <a class="button" onclick="openGallery()">Click Here 📸</a>
+  </div>
+
+  <div class="overlay" id="gallery">
+    <div class="carousel">
+      <div class="slides" id="slides">
+        <div class="slide">
+          <img class="bg" src="https://cdn.discordapp.com/attachments/1215080783111262238/1385748153768083670/Screenshot_20250621-0357232.png?ex=68573209&is=6855e089&hm=0ab1e47d0e64a841559d5069c93f3720517a1e064f9b56c80f00fa99f5fe1aaf&">
+          <div class="content-box">
+            <img class="main" src="https://cdn.discordapp.com/attachments/1215080783111262238/1385748153768083670/Screenshot_20250621-0357232.png?ex=68573209&is=6855e089&hm=0ab1e47d0e64a841559d5069c93f3720517a1e064f9b56c80f00fa99f5fe1aaf&">
+            <div class="text-box">
+              <h2>Our First Picture Together</h2>
+              <p>When the two loving souls were finally close to each other💗</p>
+            </div>
+          </div>
+        </div>
+        <div class="slide">
+          <img class="bg" src="https://cdn.discordapp.com/attachments/1215080783111262238/1385741294365835274/69b3fcd4-9da7-4175-b08a-3e9ec2be0227.jpg?ex=68572ba6&is=6855da26&hm=d34db864c45d9642d0efd15d5e106fc6a127e52fe2180d77d578e3da28b89024&">
+          <div class="content-box">
+            <img class="main" src="https://cdn.discordapp.com/attachments/1215080783111262238/1385741294365835274/69b3fcd4-9da7-4175-b08a-3e9ec2be0227.jpg?ex=68572ba6&is=6855da26&hm=d34db864c45d9642d0efd15d5e106fc6a127e52fe2180d77d578e3da28b89024&">
+            <div class="text-box">
+              <h2>The Spark of Joy</h2>
+              <p>That one smile of yours can light up my darkest days.💖</p>
+            </div>
+          </div>
+        </div>
+        <div class="slide">
+          <img class="bg" src="https://cdn.discordapp.com/attachments/1215080783111262238/1385742440735965296/IMG_8997.jpg?ex=68572cb7&is=6855db37&hm=4f44b935ecfedbca22b6b09b1b0abb5684b84fdb49cd7335e32ec4b5f155a945&">
+          <div class="content-box">
+            <img class="main" src="https://cdn.discordapp.com/attachments/1215080783111262238/1385742440735965296/IMG_8997.jpg?ex=68572cb7&is=6855db37&hm=4f44b935ecfedbca22b6b09b1b0abb5684b84fdb49cd7335e32ec4b5f155a945&">
+            <div class="text-box">
+              <h2>My Other Half</h2>
+              <p>I am incomplete without you🥺✨</p>
+            </div>
+          </div>
+        </div>
+        <div class="slide">
+          <img class="bg" src="https://cdn.discordapp.com/attachments/1215080783111262238/1385741295204438107/3fe3eb13-d9f3-4a1e-83c1-8e63cd144978.jpg?ex=68572ba6&is=6855da26&hm=360af94b523ca4f65ee7f785211008ac1fbcc37231ae4a686b7963a2df59f9aa&">
+          <div class="content-box">
+            <img class="main" src="https://cdn.discordapp.com/attachments/1215080783111262238/1385741295204438107/3fe3eb13-d9f3-4a1e-83c1-8e63cd144978.jpg?ex=68572ba6&is=6855da26&hm=360af94b523ca4f65ee7f785211008ac1fbcc37231ae4a686b7963a2df59f9aa&">
+            <div class="text-box">
+              <h2>Forever My Favorite</h2>
+              <p>No matter what, you’ll always be my happy place.💗🐼</p>
+              <a class="button" onclick="openLoveSlide()">Click here for more🤭</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button class="nav-btn left-btn" onclick="moveSlide(-1)">&#10094;</button>
+      <button class="nav-btn right-btn" onclick="moveSlide(1)">&#10095;</button>
+    </div>
+    <div class="instruction" id="instructionText"></div>
+  </div>
+
+  <div class="overlay" id="iloveyouOverlay">
+    <div class="iloveyouOverlay-content">
+      <div class="iloveyou-text" id="iloveyouText"></div>
+      <a class="button" id="clickAfter" style="display:none; margin-top: 20px;" onclick="openCounter()">Click Me 👀</a>
+    </div>
+  </div>
+
+  <div class="overlay" id="counterOverlay">
+    <div class="counter-text">
+      Been together since:<div class="counter" id="timer"></div>
+      <p>and still you are my everything. No matter how much time passes, my love for you only grows stronger. I promise to cherish every moment with you, forever and always. 💖🐼</p>
+    </div>
+  </div>
+
+  <script>
+    let current = 0;
+    const slides = document.getElementById('slides').children;
+
+    function openGallery() {
+      document.getElementById('gallery').classList.add('active');
+      detectDevice();
+      updateSlide();
+    }
+
+    function moveSlide(dir) {
+      current = (current + dir + slides.length) % slides.length;
+      updateSlide();
+    }
+
+    function updateSlide() {
+      for (let i = 0; i < slides.length; i++) {
+        slides[i].classList.remove('active');
+      }
+      slides[current].classList.add('active');
+      document.getElementById('slides').style.transform = `translateX(-${current * 100}%)`;
+    }
+
+    function detectDevice() {
+      const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+      document.getElementById('instructionText').innerText = isMobile ? 'Swipe ➔➔' : 'Use Arrow Keys';
+      if (isMobile) {
+        document.querySelector('.left-btn').style.display = 'none';
+        document.querySelector('.right-btn').style.display = 'none';
+      }
+    }
+
+    document.addEventListener('keydown', e => {
+      if (!document.getElementById('gallery').classList.contains('active')) return;
+      if (e.key === 'ArrowRight') moveSlide(1);
+      if (e.key === 'ArrowLeft') moveSlide(-1);
+    });
+
+    let startX = 0;
+    document.getElementById('gallery').addEventListener('touchstart', e => { startX = e.touches[0].clientX; });
+    document.getElementById('gallery').addEventListener('touchend', e => {
+      const diff = e.changedTouches[0].clientX - startX;
+      if (diff > 50) moveSlide(-1);
+      if (diff < -50) moveSlide(1);
+    });
+
+    function openLoveSlide() {
+      document.getElementById('gallery').classList.remove('active');
+      document.getElementById('iloveyouOverlay').classList.add('active');
+      typeText();
+    }
+
+    function typeText() {
+      const text = "I Love You Meri Cutu Panda💗🐼";
+      const container = document.getElementById("iloveyouText");
+      container.innerHTML = '';
+      [...text].forEach(ch => {
+        const span = document.createElement('span');
+        span.textContent = ch;
+        container.appendChild(span);
+      });
+      let index = 0;
+      const spans = container.querySelectorAll('span');
+      const typing = setInterval(() => {
+        if (index < spans.length) {
+          spans[index].style.opacity = 1;
+          index++;
+        } else {
+          clearInterval(typing);
+          setTimeout(() => {
+            const btn = document.getElementById("clickAfter");
+            btn.style.display = "inline-block";
+            btn.classList.add("pop-in");
+          }, 2000);
+        }
+      }, 200);
+    }
+
+    function openCounter() {
+      document.getElementById('iloveyouOverlay').classList.remove('active');
+      document.getElementById('counterOverlay').classList.add('active');
+      startCounter();
+    }
+
+    function startCounter() {
+      const startDate = new Date("2024-11-16T22:45:00");
+      function update() {
+        const now = new Date();
+        let diff = now - startDate;
+
+        let totalSeconds = Math.floor(diff / 1000);
+        let years = Math.floor(totalSeconds / (365 * 24 * 60 * 60));
+        totalSeconds -= years * 365 * 24 * 60 * 60;
+        let months = Math.floor(totalSeconds / (30 * 24 * 60 * 60));
+        totalSeconds -= months * 30 * 24 * 60 * 60;
+        let days = Math.floor(totalSeconds / (24 * 60 * 60));
+        totalSeconds -= days * 24 * 60 * 60;
+        let hours = Math.floor(totalSeconds / (60 * 60));
+        totalSeconds -= hours * 60 * 60;
+        let mins = Math.floor(totalSeconds / 60);
+        let secs = totalSeconds % 60;
+
+        let text = '';
+        if (years > 0) {
+          text = `${years} years ${months} months ${days} days ${hours} hrs ${mins} mins ${secs} secs`;
+        } else {
+          text = `${months} months ${days} days ${hours} hrs ${mins} mins ${secs} secs`;
+        }
+        document.getElementById("timer").innerText = text;
+      }
+      update();
+      setInterval(update, 1000);
+    }
+
+    setInterval(() => {
+      const heart = document.createElement('div');
+      heart.className = 'floating-heart';
+      heart.textContent = '💖';
+      heart.style.left = Math.random() * 100 + 'vw';
+      heart.style.fontSize = (Math.random() * 20 + 20) + 'px';
+      document.body.appendChild(heart);
+      setTimeout(() => heart.remove(), 10000);
+    }, 1000);
+  </script>
+</body>
+</html>
